@@ -1,5 +1,6 @@
 # wheel-zoom-win
 Use win-key with mouse wheel to zoom whole screen
+
 1.功能：
   使用Windows鍵+滑鼠滾輪放大及縮小螢幕，使用 Alt鍵+滑鼠滾輪調整視窗透明度
 
