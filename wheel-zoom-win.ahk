@@ -1,70 +1,99 @@
-﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
-; #Warn  ; Enable warnings to assist with detecting common errors.
-SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+;SetTimer WatchCursor, 100
 
-verText = Wheel Zoom for WIN 1.0
+;useTransparent := 1
 
-byText = Source code: https://github.com/rexct/wheel-zoom-win
-
-titleText = %verText% - 等待啟動放大鏡
-titleStarted = %verText% - 放大鏡已啟動
-
-useTransparent = 1
-
-startText = `n將放大鏡齒輪按鈕中 [設定縮放時檢視的變更方式] 調整到最小有較佳效果，`n並按放大鏡的視窗 [最小化] 按鈕隱藏放大鏡視窗`n`n%byText%
 transStepVal := 15 ; 透明度變動單位
 
 ;######################
 ; win-key+Wheel zoom-in and zoom-out
 ;######################
-IfWinNotExist ahk_class MagUIClass
+if !WinExist("ahk_class MagUIClass")
 {
-	Run, Magnify.exe
-	MsgBox, 0, %titleText%, %startText%, 3
+      Run("Magnify.exe")
+      WinWait("ahk_class MagUIClass")
+      ; if WinWait("ahk_class MagUIClass")
+        ; MsgBox "放大鏡啟動"
 }
-else
+
+;!LButton::
+;{
+;  move windows with Alt
+
+;}
+
+!WheelUp::
 {
-	WinGet, titleName, 
-	MsgBox, 0, %titleStarted%, %byText%, 1
+  MouseGetPos ,,&mouseWin
+;  WinActivate "ahk_id" mouseWin
+
+
+  setTrans := WinGetTransparent(mouseWin)
+
+    if (setTrans = "")
+    {
+        setTrans := 255 - transStepVal
+    }
+    else 
+    {
+        if (setTrans > transStepVal && setTrans < 256){
+            setTrans := setTrans - transStepVal
+        }
+    }
+    WinSetTransparent setTrans, "ahk_id " mouseWin
+}
+
+!WheelDown::
+{
+  MouseGetPos ,,&mouseWin
+;  WinActivate "ahk_id" mouseWin
+
+  setTrans := WinGetTransparent(mouseWin)
+
+
+    if(setTrans = ""){
+        Exit
+    } 
+    if (setTrans < 255)
+    {
+        setTrans := setTrans + transStepVal
+        WinSetTransparent setTrans, "ahk_id" mouseWin
+    }
+    
 }
 
 #WheelUp::
-	Send #=
-	IfWinNotExist ahk_class MagUIClass
-	{
-		MsgBox, 0, %titleText%, %startText%, 2
-	}
-return
+{
+  Send "#="
+}
+
 
 #WheelDown::
-	Send #-
-return
+{
+  Send "#-"
+}
 
-;######################
-; alt+wheel transparent
-;######################
-!WheelUp::
-	MouseGetPos,,, MouseWin
-	WinGet, winTrans, Transparent, ahk_id %MouseWin% ; get Transparency of window under the mouse cursor.
-	setTrans := 255
-	if ( winTrans = "" )
-	{
-		setTrans := 255 - transStepVal
-	}
-	else if ( winTrans > transStepVal && winTrans < 256)
-	{
-		setTrans := winTrans - transStepVal
-	}
-	WinSet Transparent, %setTrans%, ahk_id %MouseWin%
-return
+;; invert window color
+#n::
+{
+  Send "^!i"
+  ;active_id := WinGetID("A")
+  ;MouseGetPos ,,&mouseWin
+  ;wTitle := WinGetTitle(mouseWin)
+  ;MsgBox "The active window's ID is " wTitle
+}
 
-!WheelDown::
-	MouseGetPos,,, MouseWin
-	WinGet, winTrans, Transparent, ahk_id %MouseWin% ; get Transparency of window under the mouse cursor.
-	if ( winTrans < 255)
-	{
-		setTrans := winTrans + transStepVal
-		WinSet Transparent, %setTrans%, ahk_id %MouseWin%
-	}
-return
+#o::
+{
+    appName := "Skype"
+    WinGetPos &skypeX, &skypeY,,,appName
+    ; MsgBox "Skype at " skypeX " " skypeY
+
+    if( skypeX > 3800) {
+        WinMove -8,-8,500,1040,appName
+        WinMaximize appName
+        WinActivate appName
+    } else {
+        WinRestore appName
+        WinMove 3831,1076,500,1040, appName
+    }
+}
